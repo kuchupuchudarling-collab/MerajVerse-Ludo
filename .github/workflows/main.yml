@@ -35,7 +35,7 @@ jobs:
           cp MerajVerse-Ludo-v29-1.html app/src/main/assets/index.html
 
           cat > settings.gradle <<'EOF'
-          pluginManagement {
+          import org.gradle.api.initialization.resolve.RepositoriesModepluginManagement {
               repositories {
                   google()
                   mavenCentral()
