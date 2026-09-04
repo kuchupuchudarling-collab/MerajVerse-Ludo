@@ -27,15 +27,21 @@ jobs:
       - name: Setup Android
         uses: android-actions/setup-android@v3
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
       - name: Create Android project
+        shell: bash
         run: |
           mkdir -p app/src/main/java/com/merajverse/ludo
           mkdir -p app/src/main/assets
-
+          mkdir -p app/src/main/res/values
           cp MerajVerse-Ludo-v29-1.html app/src/main/assets/index.html
 
           cat > settings.gradle <<'EOF'
-          import org.gradle.api.initialization.resolve.RepositoriesModepluginManagement {
+          pluginManagement {
               repositories {
                   google()
                   mavenCentral()
@@ -43,7 +49,7 @@ jobs:
               }
           }
           dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositoriesMode.set(org.gradle.api.initialization.resolve.RepositoriesMode.FAIL_ON_PROJECT_REPOS)
               repositories {
                   google()
                   mavenCentral()
@@ -80,33 +86,28 @@ jobs:
 
           cat > app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <uses-permission android:name="android.permission.INTERNET"/>
-              <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.RECORD_AUDIO" />
               <application
                   android:theme="@style/AppTheme"
                   android:label="MerajVerse Ludo"
-                  android:usesCleartextTraffic="true"
-                  android:hardwareAccelerated="true">
+                  android:usesCleartextTraffic="true">
                   <activity
                       android:name=".MainActivity"
                       android:screenOrientation="portrait"
                       android:exported="true">
                       <intent-filter>
-                          <action android:name="android.intent.action.MAIN"/>
-                          <category android:name="android.intent.category.LAUNCHER"/>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
                       </intent-filter>
                   </activity>
               </application>
           </manifest>
           EOF
 
-          mkdir -p app/src/main/res/values
-
           cat > app/src/main/res/values/styles.xml <<'EOF'
           <resources>
               <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
-                  <item name="android:fontFamily">sans</item>
                   <item name="android:windowFullscreen">true</item>
                   <item name="android:colorAccent">#ffffff</item>
               </style>
@@ -122,14 +123,13 @@ jobs:
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
           import android.webkit.PermissionRequest;
+          import android.webkit.WebChromeClient;
 
           public class MainActivity extends Activity {
-              WebView web;
-
               @Override
               protected void onCreate(Bundle b) {
                   super.onCreate(b);
-                  web = new WebView(this);
+                  WebView web = new WebView(this);
                   WebSettings s = web.getSettings();
                   s.setJavaScriptEnabled(true);
                   s.setDomStorageEnabled(true);
@@ -137,7 +137,7 @@ jobs:
                   s.setAllowFileAccess(true);
                   s.setAllowContentAccess(true);
                   web.setWebViewClient(new WebViewClient());
-                  web.setWebChromeClient(new android.webkit.WebChromeClient() {
+                  web.setWebChromeClient(new WebChromeClient() {
                       @Override
                       public void onPermissionRequest(final PermissionRequest r) {
                           runOnUiThread(() -> r.grant(r.getResources()));
@@ -149,14 +149,8 @@ jobs:
           }
           EOF
 
-      - name: Install Gradle
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gradle
-          gradle wrapper --gradle-version 8.9
-
       - name: Build APK
-        run: ./gradlew assembleDebug
+        run: gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
