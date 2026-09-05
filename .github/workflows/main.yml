@@ -38,7 +38,7 @@ jobs:
           mkdir -p app/src/main/java/com/merajverse/ludo
           mkdir -p app/src/main/assets
           mkdir -p app/src/main/res/values
-          MerajVerse-Ludo-v31-6.html
+          cp MerajVerse-Ludo-v31-6.html app/src/main/assets/index.html
 
           cat > settings.gradle <<'EOF'
           pluginManagement {
