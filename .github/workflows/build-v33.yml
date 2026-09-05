@@ -1,0 +1,159 @@
+name: Build MerajVerse Ludo v33
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "MerajVerse-Ludo-v33-Proper.html"
+      - ".github/workflows/build-v33.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Create Android project
+        shell: bash
+        run: |
+          mkdir -p app/src/main/java/com/merajverse/ludo
+          mkdir -p app/src/main/assets
+          mkdir -p app/src/main/res/values
+
+          cp MerajVerse-Ludo-v33-Proper.html app/src/main/assets/index.html
+
+          cat > settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(org.gradle.api.initialization.resolve.RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = "MerajVerseLudo"
+          include ":app"
+          EOF
+
+          cat > build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.7.3' apply false
+          }
+          EOF
+
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+          }
+
+          android {
+              namespace 'com.merajverse.ludo'
+              compileSdk 35
+
+              defaultConfig {
+                  applicationId 'com.merajverse.ludo'
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 33
+                  versionName '3.3'
+              }
+          }
+          EOF
+
+          cat > app/src/main/AndroidManifest.xml <<'EOF'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.RECORD_AUDIO" />
+              <application
+                  android:theme="@style/AppTheme"
+                  android:label="MerajVerse Ludo"
+                  android:usesCleartextTraffic="true">
+                  <activity
+                      android:name=".MainActivity"
+                      android:screenOrientation="portrait"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+
+          cat > app/src/main/res/values/styles.xml <<'EOF'
+          <resources>
+              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+                  <item name="android:windowFullscreen">true</item>
+                  <item name="android:colorAccent">#ffffff</item>
+              </style>
+          </resources>
+          EOF
+
+          cat > app/src/main/java/com/merajverse/ludo/MainActivity.java <<'EOF'
+          package com.merajverse.ludo;
+
+          import android.app.Activity;
+          import android.os.Bundle;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+          import android.webkit.PermissionRequest;
+          import android.webkit.WebChromeClient;
+
+          public class MainActivity extends Activity {
+              @Override
+              protected void onCreate(Bundle b) {
+                  super.onCreate(b);
+                  WebView web = new WebView(this);
+                  WebSettings s = web.getSettings();
+                  s.setJavaScriptEnabled(true);
+                  s.setDomStorageEnabled(true);
+                  s.setMediaPlaybackRequiresUserGesture(false);
+                  s.setAllowFileAccess(true);
+                  s.setAllowContentAccess(true);
+                  web.setWebViewClient(new WebViewClient());
+                  web.setWebChromeClient(new WebChromeClient() {
+                      @Override
+                      public void onPermissionRequest(final PermissionRequest r) {
+                          runOnUiThread(() -> r.grant(r.getResources()));
+                      }
+                  });
+                  web.loadUrl("file:///android_asset/index.html");
+                  setContentView(web);
+              }
+          }
+          EOF
+
+      - name: Build APK
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MerajVerse-Ludo-v33-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
