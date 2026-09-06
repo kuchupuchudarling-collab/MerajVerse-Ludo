@@ -20,7 +20,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p app/src/main/assets app/src/main/java/com/merajverse/ludo
-          cp MerajVerse-Ludo-v36-Proper-Ludo.html app/src/main/assets/index.html
+        cp MerajVerse-Ludo-v35-Proper-Ludo-1.html app/src/main/assets/index.html
           cat > settings.gradle <<'EOF'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
           dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
