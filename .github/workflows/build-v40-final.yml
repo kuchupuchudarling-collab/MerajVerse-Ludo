@@ -26,7 +26,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p app/src/main/assets app/src/main/java/com/merajverse/ludo app/src/main/res/values
-          cp MerajVerse-Ludo-FINAL-ALL-IN-ONE-v40-FINAL.html app/src/main/assets/index.html
+          cp MerajVerse-Ludo-FINAL-ALL-IN-ONE-v40-FINAL-1.html app/src/main/assets/index.html
 
           cat > settings.gradle <<'EOG'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
