@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - 'MerajVerse-Ludo-v38-Proper-Ludo.html'
-      - '.github/workflows/build-v38-apk.yml 
+      - '.github/workflows/build-v38-apk.yml'
 
 jobs:
   build:
