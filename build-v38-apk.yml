@@ -95,5 +95,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: MerajVerse-Ludo-v37-APK
+          name: Merajverse-Ludo-v38-APK
           path: app/build/outputs/apk/debug/app-debug.apk
