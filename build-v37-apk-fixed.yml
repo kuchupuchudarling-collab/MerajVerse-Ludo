@@ -1,11 +1,11 @@
-name: Build MerajVerse Ludo v37 APK
+name: Build MerajVerse Ludo v38 APK
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'MerajVerse-Ludo-v37-Proper-Ludo.html'
-      - '.github/workflows/build-v37-apk.yml'
+      - 'MerajVerse-Ludo-v38-Proper-Ludo.html'
+      - '.github/workflows/build-v38-apk.yml 
 
 jobs:
   build:
@@ -48,8 +48,8 @@ jobs:
               applicationId 'com.merajverse.ludo'
               minSdk 23
               targetSdk 35
-              versionCode 37
-              versionName '3.7'
+              versionCode 38 
+              versionName '3.8'
             }
           }
           EOG
